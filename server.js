@@ -163,7 +163,21 @@ function adminMiddleware(req, res, next) {
 }
 
 // ─── Static Files ─────────────────────────────────────────
-app.use(express.static(__dirname));
+// Serve static files with proper caching
+app.use(express.static(__dirname, {
+  setHeaders: (res, filepath) => {
+    // Don't cache HTML files - always get latest version
+    if (filepath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+    // Cache JS/CSS for 1 hour
+    if (filepath.endsWith('.js') || filepath.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+  }
+}));
 app.use('/uploads', express.static(uploadDir));
 
 // ─── Auth Routes ──────────────────────────────────────────

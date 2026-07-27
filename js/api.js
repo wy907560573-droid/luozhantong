@@ -56,6 +56,7 @@ const API = (() => {
     const url = _baseUrl + path;
     const config = {
       headers: getAuthHeaders(),
+      signal: AbortSignal.timeout(10000), // 10s timeout for all API calls
       ...options,
     };
     // Don't set Content-Type for FormData

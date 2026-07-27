@@ -1763,61 +1763,72 @@ function bindEvents() {
 async function initApp() {
   showLoading('启动中...');
 
+  // Safety timeout: force hide loading after 8 seconds no matter what
+  const safetyTimer = setTimeout(() => {
+    hideLoading();
+    console.warn('initApp safety timeout triggered');
+  }, 8000);
+
   try {
     // Initialize store (detects API/Local mode)
-    await Store.init();
+    try {
+      await Store.init();
+    } catch(e) {
+      console.warn('Store init failed:', e);
+    }
+
+    bindEvents();
+
+    // Check if already logged in
+    const savedUser = Store.getCurrentUser();
+    if (savedUser) {
+      // Show main app
+      document.getElementById('page-login').classList.remove('active');
+      document.getElementById('main-app').classList.remove('hidden');
+
+      // Restore API auth if applicable
+      if (Store._useApi) {
+        try {
+          const apiAuth = JSON.parse(localStorage.getItem('azt_api_auth') || 'null');
+          if (apiAuth) {
+            API.setAuth(apiAuth.phone, apiAuth.token);
+          }
+        } catch(e) {}
+      }
+
+      const isAdmin = savedUser.role === 'admin';
+      const dashboardNav = document.querySelector('.nav-item[data-page="dashboard"]');
+      const detailsNav = document.querySelector('.nav-item[data-page="details"]');
+      const reviewNav = document.querySelector('.nav-item[data-page="review"]');
+      const verifyNav = document.querySelector('.nav-item[data-page="verify"]');
+      const backFromPermit = document.getElementById('back-from-permit');
+
+      if (isAdmin) {
+        if (dashboardNav) dashboardNav.classList.remove('hidden');
+        if (detailsNav) detailsNav.classList.remove('hidden');
+        if (reviewNav) reviewNav.classList.remove('hidden');
+        if (verifyNav) verifyNav.classList.remove('hidden');
+        if (backFromPermit) backFromPermit.classList.remove('hidden');
+        try { await updateReviewBadge(); } catch(e) { console.warn('updateReviewBadge failed:', e); }
+        try { await showPage('dashboard'); } catch(e) { console.warn('showPage dashboard failed:', e); }
+      } else {
+        if (dashboardNav) dashboardNav.classList.add('hidden');
+        if (detailsNav) detailsNav.classList.add('hidden');
+        if (reviewNav) reviewNav.classList.add('hidden');
+        if (verifyNav) verifyNav.classList.add('hidden');
+        if (backFromPermit) backFromPermit.classList.add('hidden');
+        NewPermit.reset();
+        showPage('new-permit');
+      }
+
+      FaceModule.loadModels().catch(() => {});
+    }
   } catch(e) {
-    console.warn('Store init failed:', e);
+    console.error('initApp error:', e);
+  } finally {
+    clearTimeout(safetyTimer);
+    hideLoading();
   }
-
-  bindEvents();
-
-  // Check if already logged in
-  const savedUser = Store.getCurrentUser();
-  if (savedUser) {
-    // Show main app
-    document.getElementById('page-login').classList.remove('active');
-    document.getElementById('main-app').classList.remove('hidden');
-
-    // Restore API auth if applicable
-    if (Store._useApi) {
-      try {
-        const apiAuth = JSON.parse(localStorage.getItem('azt_api_auth') || 'null');
-        if (apiAuth) {
-          API.setAuth(apiAuth.phone, apiAuth.token);
-        }
-      } catch(e) {}
-    }
-
-    const isAdmin = savedUser.role === 'admin';
-    const dashboardNav = document.querySelector('.nav-item[data-page="dashboard"]');
-    const detailsNav = document.querySelector('.nav-item[data-page="details"]');
-    const reviewNav = document.querySelector('.nav-item[data-page="review"]');
-    const verifyNav = document.querySelector('.nav-item[data-page="verify"]');
-    const backFromPermit = document.getElementById('back-from-permit');
-
-    if (isAdmin) {
-      if (dashboardNav) dashboardNav.classList.remove('hidden');
-      if (detailsNav) detailsNav.classList.remove('hidden');
-      if (reviewNav) reviewNav.classList.remove('hidden');
-      if (verifyNav) verifyNav.classList.remove('hidden');
-      if (backFromPermit) backFromPermit.classList.remove('hidden');
-      await updateReviewBadge();
-      await showPage('dashboard');
-    } else {
-      if (dashboardNav) dashboardNav.classList.add('hidden');
-      if (detailsNav) detailsNav.classList.add('hidden');
-      if (reviewNav) reviewNav.classList.add('hidden');
-      if (verifyNav) verifyNav.classList.add('hidden');
-      if (backFromPermit) backFromPermit.classList.add('hidden');
-      NewPermit.reset();
-      showPage('new-permit');
-    }
-
-    FaceModule.loadModels().catch(() => {});
-  }
-
-  hideLoading();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
