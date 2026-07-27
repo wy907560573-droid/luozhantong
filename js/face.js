@@ -5,7 +5,7 @@
  */
 
 const FaceModule = {
-  MODEL_URL: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model/',
+  MODEL_URL: 'js/models',
   modelsLoaded: false,
   loadingPromise: null,
 
@@ -37,9 +37,9 @@ const FaceModule = {
         // 尝试备用CDN
         try {
           await Promise.all([
-            faceapi.nets.ssdMobilenetv1.loadFromUri('https://raw.githubusercontent.com/vladmandic/face-api/master/model/'),
-            faceapi.nets.faceLandmark68Net.loadFromUri('https://raw.githubusercontent.com/vladmandic/face-api/master/model/'),
-            faceapi.nets.faceRecognitionNet.loadFromUri('https://raw.githubusercontent.com/vladmandic/face-api/master/model/'),
+            faceapi.nets.ssdMobilenetv1.loadFromUri('js/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('js/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('js/models'),
           ]);
           this.modelsLoaded = true;
           console.log('人脸识别模型加载成功(备用源)');
