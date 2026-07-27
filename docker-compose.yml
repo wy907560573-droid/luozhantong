@@ -1,0 +1,33 @@
+# 落站通 Docker Compose 配置
+# 一键启动：docker compose up -d
+# 访问：http://localhost:3000
+
+services:
+  luozhantong:
+    build: .
+    container_name: luozhantong
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_PATH=/app/data/data.db
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      # 数据持久化：数据库文件
+      - luozhantong_data:/app/data
+      # 数据持久化：上传的图片
+      - luozhantong_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  luozhantong_data:
+    name: luozhantong_data
+  luozhantong_uploads:
+    name: luozhantong_uploads

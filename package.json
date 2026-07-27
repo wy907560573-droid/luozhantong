@@ -1,0 +1,20 @@
+{
+  "name": "luozhantong",
+  "version": "2.0.0",
+  "description": "落站通 - EHS承包商入场许可证管理平台",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["EHS", "permit", "safety"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^4.21.2",
+    "multer": "^2.2.0",
+    "sql.js": "^1.14.1",
+    "uuid": "^14.0.1"
+  }
+}

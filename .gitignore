@@ -1,0 +1,31 @@
+# 依赖
+node_modules/
+
+# 运行时数据
+*.db
+data.db
+data/
+uploads/*
+
+# 保持 uploads 目录存在
+!uploads/.gitkeep
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+
+# 临时文件
+deploy-static/
+*.pem
+*.key
+
+# 系统文件
+.DS_Store
+Thumbs.db
+.workbuddy/
+serveo_*
+
+# IDE
+.vscode/
+.idea/

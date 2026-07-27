@@ -1,0 +1,26 @@
+# 落站通 - Docker 忽略文件
+
+# 依赖（容器内安装）
+node_modules/
+
+# 运行时数据（通过卷挂载）
+data.db
+uploads/
+
+# 开发/临时文件
+deploy-static/
+.serveo/
+*.log
+npm-debug.log*
+
+# 系统文件
+.git/
+.gitignore
+.DS_Store
+Thumbs.db
+.workbuddy/
+
+# 临时部署目录
+serveo_*
+*.pem
+*.key

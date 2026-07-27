@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>品牌简介 - 中换电（浙江）科技有限公司</title>
+  <style>
+    :root {
+      --color-primary: #0B3D91;
+      --color-accent: #f97316;
+      --color-bg: #f0f2f5;
+      --color-card: #fff;
+      --color-text: #1e293b;
+      --color-text-secondary: #64748b;
+      --color-border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      background: var(--color-bg);
+      color: var(--color-text);
+      -webkit-font-smoothing: antialiased;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    .page-header {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #1a5fb4 100%);
+      padding: 24px 20px 20px;
+      color: #fff;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-back {
+      color: #fff;
+      text-decoration: none;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      flex: 1;
+      text-align: left;
+    }
+    .page-content {
+      padding: 16px;
+    }
+
+    /* Logo区 */
+    .brand-hero {
+      text-align: center;
+      padding: 20px 16px 16px;
+      background: var(--color-card);
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .brand-logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 10px;
+      background: linear-gradient(135deg, var(--color-primary), #1a5fb4);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin-bottom: 4px;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* 内容块 */
+    .block {
+      background: var(--color-card);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .block-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: 10px;
+      padding-left: 10px;
+      border-left: 3px solid var(--color-accent);
+      line-height: 1.3;
+    }
+    .text {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+      margin-bottom: 8px;
+      text-align: justify;
+    }
+
+    /* 模块列表 */
+    .module-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .module-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #e8f0fe;
+      border-radius: var(--radius-sm);
+    }
+    .module-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary), #1a5fb4);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .module-body { flex: 1; }
+    .module-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .module-desc { font-size: 12px; color: var(--color-text-secondary); }
+
+    /* 优势网格 */
+    .adv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .adv-card {
+      padding: 12px 10px;
+      background: linear-gradient(135deg, #f8faff 0%, #fff8f4 100%);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      text-align: center;
+    }
+    .adv-icon {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-accent), #ea580c);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 6px;
+      font-size: 16px;
+    }
+    .adv-name { font-size: 12px; font-weight: 700; color: var(--color-primary); margin-bottom: 3px; }
+    .adv-desc { font-size: 10.5px; color: var(--color-text-secondary); line-height: 1.4; }
+
+    .footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <a href="/" class="header-back">&#8592;</a>
+    <div class="header-title">品牌简介</div>
+  </div>
+
+  <div class="page-content">
+    <!-- 品牌标识 -->
+    <div class="brand-hero">
+      <div class="brand-logo">
+        <svg viewBox="0 0 48 48" width="36" height="36">
+          <path fill="#fff" d="M24 6L6 14v12c0 10.5 6.7 18.7 18 20 11.3-1.3 18-9.5 18-20V14L24 6zm-4 26l-8-8 2.8-2.8L20 26.4l13.2-13.2L36 16 20 32z"/>
+        </svg>
+      </div>
+      <div class="brand-name">中换电（浙江）科技有限公司</div>
+      <div class="brand-sub">全球开放式换电生态倡导者</div>
+    </div>
+
+    <!-- 品牌简介 -->
+    <div class="block">
+      <div class="block-title">品牌简介</div>
+      <p class="text">浙江中换电是中换电（浙江）科技有限公司旗下品牌。</p>
+      <p class="text">中换电（浙江）科技有限公司（简称中换电），为康迪科技集团（纳斯达克上市: KNDI）战略投资开放式换电平台，注册资本5亿元，公司总部位于互联网之都杭州。公司拥有创始股东及团队深耕汽车行业30余年，是中国较早从事新能源汽车研发、生产、运营、换电等生态的开拓者和先行者，累计生产销售新能源汽车8万台以上、租赁运营新能源汽车4万台以上、换电运营新能源汽车1万台以上，具备研、产、销、营一体化新能源产业链运营体系。</p>
+      <p class="text">中换电定位于换电整体解决方案提供商。公司依托创始股东及团队丰富的新能源换电生态实践经验，在运营平台体系中运用大数据、5G车联网、人工智能AI等创新技术，实现了运营平台、车企平台、电池生产、换电服务的互联互通。作为全球开放式换电生态倡导者，为推动能源循环利用，促进人与环境和谐共生而努力！</p>
+    </div>
+
+    <!-- 八大模块 -->
+    <div class="block">
+      <div class="block-title">智能换电系统 · 八大模块</div>
+      <div class="module-list">
+        <div class="module-item">
+          <div class="module-num">1</div>
+          <div class="module-body">
+            <div class="module-name">电池更换系统</div>
+            <div class="module-desc">实现电池自动查找更换</div>
+          </div>
+        </div>
+        <div class="module-item">
+          <div class="module-num">2</div>
+          <div class="module-body">
+            <div class="module-name">车辆定位系统</div>
+            <div class="module-desc">消除车辆误差，实现精准定位，可根据车型信息调整定位参数</div>
+          </div>
+        </div>
+        <div class="module-item">
+          <div class="module-num">3</div>
+          <div class="module-body">
+            <div class="module-name">电控管理系统</div>
+            <div class="module-desc">通过传感器信息采集，实现自动控制</div>
+          </div>
+        </div>
+        <div class="module-item">
+          <div class="module-num">4</div>
+          <div class="module-body">
+            <div class="module-name">仓位管理系统</div>
+            <div class="module-desc">实现精准查找空电池仓位和满电池仓位</div>
+          </div>
+        </div>
+        <div class="module-item">
+          <div class="module-num">5</div>
+          <div class="module-body">
+            <div class="module-name">用户交互系统</div>
+            <div class="module-desc">实现一键操作、自动计费</div>
+          </div>
+        </div>
+        <div class="module-item">
+          <div class="module-num">6</div>
+          <div class="module-body">
+            <div class="module-name">充电管理系统</div>
+            <div class="module-desc">实现充电全过程管理</div>
+          </div>
+        </div>
+        <div class="module-item">
+          <div class="module-num">7</div>
+          <div class="module-body">
+            <div class="module-name">数据推送系统</div>
+            <div class="module-desc">通过数据推送，方便用户换电</div>
+          </div>
+        </div>
+        <div class="module-item">
+          <div class="module-num">8</div>
+          <div class="module-body">
+            <div class="module-name">视频监控系统</div>
+            <div class="module-desc">换电过程实时监控，确保全过程安全可靠</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 六大优势 -->
+    <div class="block">
+      <div class="block-title">六大优势</div>
+      <div class="adv-grid">
+        <div class="adv-card">
+          <div class="adv-icon">&#9889;</div>
+          <div class="adv-name">一键换电</div>
+          <div class="adv-desc">换电过程全自动，无需专业人员介入</div>
+        </div>
+        <div class="adv-card">
+          <div class="adv-icon">&#9201;</div>
+          <div class="adv-name">高效服务</div>
+          <div class="adv-desc">90秒完成换电，比加油更快</div>
+        </div>
+        <div class="adv-card">
+          <div class="adv-icon">&#128179;</div>
+          <div class="adv-name">自动计费</div>
+          <div class="adv-desc">根据电量差值自动计算费用</div>
+        </div>
+        <div class="adv-card">
+          <div class="adv-icon">&#128065;</div>
+          <div class="adv-name">实时监控</div>
+          <div class="adv-desc">管理员可以对系统状态一目了然</div>
+        </div>
+        <div class="adv-card">
+          <div class="adv-icon">&#127777;</div>
+          <div class="adv-name">恒温充电</div>
+          <div class="adv-desc">恒温充电延长电池寿命、降低火灾隐患，实现"削峰填谷"</div>
+        </div>
+        <div class="adv-card">
+          <div class="adv-icon">&#127760;</div>
+          <div class="adv-name">节约用地</div>
+          <div class="adv-desc">设备占地仅50多平方，化解城市用地资源紧缺</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">中换电（浙江）科技有限公司 &copy; 2026</div>
+  </div>
+</body>
+</html>

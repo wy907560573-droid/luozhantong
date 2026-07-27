@@ -1,0 +1,24 @@
+# Render Blueprint — 落站通一键部署配置
+# 使用方法: 推送到 GitHub → Render 自动检测此文件 → 一键部署
+# 详情: https://render.com/docs/blueprint-spec
+
+services:
+  # Web 服务 — Node.js 后端 + 静态前端
+  - type: web
+    name: luozhantong
+    env: node
+    region: singapore          # 新加坡节点（亚洲访问快）
+    plan: free                 # 免费方案（750小时/月，够7x24运行）
+    buildCommand: npm install --production
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: DB_PATH
+        value: ./data.db
+      - key: UPLOAD_DIR
+        value: ./uploads
+    autoDeploy: true           # Git push 自动部署

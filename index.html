@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0B3D91">
+  <title>落站通 - EHS承包商入场许可证管理</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <div id="app-root">
+
+    <!-- ==================== 登录页 ==================== -->
+    <div id="page-login" class="page page-full active">
+      <div class="login-container">
+        <div class="login-header">
+          <div class="login-logo">
+            <svg viewBox="0 0 80 80" width="64" height="64">
+              <defs>
+                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#0B3D91"/>
+                  <stop offset="100%" style="stop-color:#1a5fb4"/>
+                </linearGradient>
+              </defs>
+              <rect x="4" y="4" width="72" height="72" rx="16" fill="url(#logoGrad)"/>
+              <path d="M40 16 L58 24 L58 42 C58 54 50 60 40 64 C30 60 22 54 22 42 L22 24 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M32 40 L37 45 L49 33" fill="none" stroke="#f97316" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h1 class="login-title">落站通</h1>
+          <p class="login-subtitle">承包商入场许可证数字化管理平台</p>
+        </div>
+
+        <div class="login-tabs">
+          <button class="login-tab active" data-tab="user">普通用户</button>
+          <button class="login-tab" data-tab="admin">管理员</button>
+        </div>
+
+        <!-- 普通用户登录 -->
+        <div id="login-user-panel" class="login-panel active">
+          <div class="form-group">
+            <label class="form-label">手机号</label>
+            <input type="tel" id="login-user-phone" class="form-input" placeholder="请输入手机号" maxlength="11">
+          </div>
+          <div class="form-group">
+            <label class="form-label">密码</label>
+            <input type="password" id="login-user-pwd" class="form-input" placeholder="请输入密码">
+          </div>
+          <button class="btn btn-primary btn-block" id="btn-login-user">登 录</button>
+          <div class="login-links">
+            <a href="javascript:void(0)" id="link-change-pwd">修改密码</a>
+          </div>
+        </div>
+
+        <!-- 管理员登录 -->
+        <div id="login-admin-panel" class="login-panel">
+          <div class="form-group">
+            <label class="form-label">管理员账号</label>
+            <input type="text" id="login-admin-name" class="form-input" placeholder="请输入管理员账号" value="admin">
+          </div>
+          <div class="form-group">
+            <label class="form-label">密码</label>
+            <input type="password" id="login-admin-pwd" class="form-input" placeholder="请输入密码" value="admin123">
+          </div>
+          <button class="btn btn-primary btn-block" id="btn-login-admin">管理员登录</button>
+        </div>
+
+        <!-- 修改密码面板 -->
+        <div id="change-pwd-panel" class="login-panel">
+          <div class="form-group">
+            <label class="form-label">手机号</label>
+            <input type="tel" id="cpwd-phone" class="form-input" placeholder="请输入手机号" maxlength="11">
+          </div>
+          <div class="form-group">
+            <label class="form-label">原密码</label>
+            <input type="password" id="cpwd-old" class="form-input" placeholder="请输入原密码">
+          </div>
+          <div class="form-group">
+            <label class="form-label">新密码</label>
+            <input type="password" id="cpwd-new" class="form-input" placeholder="请输入新密码">
+          </div>
+          <div class="form-group">
+            <label class="form-label">确认新密码</label>
+            <input type="password" id="cpwd-confirm" class="form-input" placeholder="请再次输入新密码">
+          </div>
+          <button class="btn btn-primary btn-block" id="btn-change-pwd">确认修改</button>
+          <div class="login-links">
+            <a href="javascript:void(0)" id="link-back-login">返回登录</a>
+          </div>
+        </div>
+
+        <div class="login-footer">
+          <p>开发者 中换电（浙江）科技有限公司&copy;</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 主应用容器 ==================== -->
+    <div id="main-app" class="hidden">
+
+      <!-- ==================== 首页看板 ==================== -->
+      <div id="page-dashboard" class="page">
+        <div class="page-header">
+          <div class="header-left">
+            <span class="header-title">落站通</span>
+            <span class="header-sub">数据看板</span>
+          </div>
+          <div class="header-right">
+            <span class="user-badge" id="dashboard-user-badge">管理员</span>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <!-- 公司Logo横幅 -->
+          <div class="brand-banner">
+            <img src="images/company-logo.png" alt="中换电" class="brand-logo">
+            <div class="brand-info">
+              <div class="brand-name">中换电</div>
+              <div class="brand-tagline">换电整体解决方案提供商 · 让能源循环利用</div>
+            </div>
+          </div>
+
+          <!-- 数据卡片 -->
+          <div class="stat-cards">
+            <div class="stat-card stat-today" data-range="today">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm-.5-13H11v6l5.2 3.1.8-1.3-4.5-2.7V7z"/></svg>
+              </div>
+              <div class="stat-value" id="stat-today">0</div>
+              <div class="stat-label">今日备案</div>
+            </div>
+            <div class="stat-card stat-month" data-range="month">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+              </div>
+              <div class="stat-value" id="stat-month">0</div>
+              <div class="stat-label" id="stat-month-label">本月备案</div>
+            </div>
+            <div class="stat-card stat-quarter" data-range="quarter">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+              </div>
+              <div class="stat-value" id="stat-quarter">0</div>
+              <div class="stat-label">季度备案</div>
+            </div>
+            <div class="stat-card stat-year" data-range="year">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="stat-value" id="stat-year">0</div>
+              <div class="stat-label">年度备案</div>
+            </div>
+          </div>
+
+          <!-- 趋势图表 -->
+          <div class="chart-section">
+            <div class="section-title">
+              <span>月度备案趋势</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="trend-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- 新增入场证按钮 -->
+          <div class="add-permit-section">
+            <button class="btn-add-permit" id="btn-add-permit">
+              <svg viewBox="0 0 24 24" width="32" height="32"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              <span>新增入场证</span>
+            </button>
+          </div>
+
+          <!-- 快捷状态 -->
+          <div class="quick-stats">
+            <div class="quick-stat-item">
+              <span class="quick-stat-num" id="quick-pending">0</span>
+              <span class="quick-stat-label">待审核</span>
+            </div>
+            <div class="quick-stat-item">
+              <span class="quick-stat-num" id="quick-valid">0</span>
+              <span class="quick-stat-label">有效证件</span>
+            </div>
+            <div class="quick-stat-item">
+              <span class="quick-stat-num" id="quick-expired">0</span>
+              <span class="quick-stat-label">已过期</span>
+            </div>
+            <div class="quick-stat-item">
+              <span class="quick-stat-num" id="quick-exited">0</span>
+              <span class="quick-stat-label">已离场</span>
+            </div>
+            <div class="quick-stat-item">
+              <span class="quick-stat-num" id="quick-verify">0</span>
+              <span class="quick-stat-label">核验次数</span>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer"><p>中换电（浙江）科技有限公司&copy;</p></div>
+      </div>
+
+      <!-- ==================== 新增入场证 ==================== -->
+      <div id="page-new-permit" class="page">
+        <div class="page-header">
+          <div class="header-left">
+            <button class="btn-back" id="back-from-permit">
+              <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            </button>
+            <span class="header-title">新增入场证</span>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <!-- 人像采集 -->
+          <div class="photo-capture-section">
+            <div class="section-title"><span>人像采集</span></div>
+            <div class="photo-preview-area" id="photo-preview-area">
+              <div class="photo-placeholder" id="photo-placeholder">
+                <svg viewBox="0 0 24 24" width="48" height="48"><path fill="#bbb" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <p>点击拍照或上传照片</p>
+                <p class="photo-hint">要求：正面、无遮挡、白底</p>
+              </div>
+              <img id="captured-photo" class="captured-photo hidden" alt="人像">
+            </div>
+            <div class="photo-buttons">
+              <button class="btn btn-outline btn-photo" id="btn-camera">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                拍照
+              </button>
+              <button class="btn btn-outline btn-photo" id="btn-album">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg>
+                相册
+              </button>
+              <button class="btn btn-outline btn-photo btn-remove hidden" id="btn-remove-photo">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                删除
+              </button>
+            </div>
+            <input type="file" id="file-camera" accept="image/*" capture="user" class="hidden">
+            <input type="file" id="file-album" accept="image/*" class="hidden">
+          </div>
+
+          <!-- 基础信息 -->
+          <div class="form-section">
+            <div class="section-title"><span>基础信息</span></div>
+            <div class="form-group">
+              <label class="form-label">姓名 <span class="required">*</span></label>
+              <input type="text" id="permit-name" class="form-input" placeholder="请输入姓名">
+            </div>
+            <div class="form-group">
+              <label class="form-label">电话 <span class="required">*</span></label>
+              <input type="tel" id="permit-phone" class="form-input" placeholder="请输入手机号" maxlength="11">
+            </div>
+            <div class="form-group">
+              <label class="form-label">性别 <span class="required">*</span></label>
+              <select id="permit-gender" class="form-input form-select">
+                <option value="">请选择</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">身份证号 <span class="required">*</span></label>
+              <input type="text" id="permit-idcard" class="form-input" placeholder="请输入身份证号" maxlength="18">
+            </div>
+            <div class="form-group">
+              <label class="form-label">身份证复印件 <span class="required">*</span></label>
+              <p class="form-hint">请上传身份证正反面照片</p>
+              <div class="idcard-upload-area">
+                <div class="idcard-upload-item" id="idcard-front-item">
+                  <div class="idcard-upload-box" id="idcard-front-box" onclick="document.getElementById('file-idcard-front').click()">
+                    <div class="idcard-upload-placeholder" id="idcard-front-placeholder">
+                      <svg viewBox="0 0 24 24" width="28" height="28"><path fill="#bbb" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zM5 18l3.5-4.5 2.5 3.01L14.5 12 19 18H5z"/></svg>
+                      <span>正面（人像面）</span>
+                    </div>
+                    <img id="idcard-front-preview" class="idcard-preview-img hidden" alt="身份证正面">
+                    <button type="button" class="idcard-remove-btn hidden" id="idcard-front-remove" onclick="event.stopPropagation();NewPermit.removeIdCard('front')">&times;</button>
+                  </div>
+                  <input type="file" id="file-idcard-front" accept="image/*" class="hidden" onchange="NewPermit.handleIdCardFile('front', this.files[0])">
+                </div>
+                <div class="idcard-upload-item" id="idcard-back-item">
+                  <div class="idcard-upload-box" id="idcard-back-box" onclick="document.getElementById('file-idcard-back').click()">
+                    <div class="idcard-upload-placeholder" id="idcard-back-placeholder">
+                      <svg viewBox="0 0 24 24" width="28" height="28"><path fill="#bbb" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zM5 18l3.5-4.5 2.5 3.01L14.5 12 19 18H5z"/></svg>
+                      <span>反面（国徽面）</span>
+                    </div>
+                    <img id="idcard-back-preview" class="idcard-preview-img hidden" alt="身份证反面">
+                    <button type="button" class="idcard-remove-btn hidden" id="idcard-back-remove" onclick="event.stopPropagation();NewPermit.removeIdCard('back')">&times;</button>
+                  </div>
+                  <input type="file" id="file-idcard-back" accept="image/*" class="hidden" onchange="NewPermit.handleIdCardFile('back', this.files[0])">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">单位名称 <span class="required">*</span></label>
+              <input type="text" id="permit-unit" class="form-input" list="unit-list" placeholder="请输入或选择单位">
+              <datalist id="unit-list"></datalist>
+            </div>
+            <div class="form-group">
+              <label class="form-label">落站项目名称 <span class="required">*</span></label>
+              <input type="text" id="permit-project-name" class="form-input" placeholder="请输入落站项目名称">
+            </div>
+            <div class="form-group">
+              <label class="form-label">落站地点 <span class="required">*</span></label>
+              <input type="text" id="permit-site-location" class="form-input" placeholder="请输入落站地点">
+            </div>
+            <div class="form-group">
+              <label class="form-label">落站经验 <span class="required">*</span></label>
+              <select id="permit-experience" class="form-input">
+                <option value="">请选择落站经验</option>
+                <option value="≤2个">≤2个</option>
+                <option value="3-5个">3-5个</option>
+                <option value="≥6个">≥6个</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">特种作业证书 <span class="required">*</span></label>
+              <p class="form-hint">可多选，特种作业请上传对应证书</p>
+              <div class="jobtype-chips" id="jobtype-chips">
+                <button type="button" class="jobtype-chip" data-type="电工" data-cert="电工证">电工</button>
+                <button type="button" class="jobtype-chip" data-type="焊工" data-cert="焊工证">焊工</button>
+                <button type="button" class="jobtype-chip" data-type="高处作业" data-cert="高处作业证">高处作业</button>
+                <button type="button" class="jobtype-chip" data-type="司索工" data-cert="司索特种作业证">司索工</button>
+                <button type="button" class="jobtype-chip" data-type="叉车司机" data-cert="叉车证">叉车司机</button>
+                <button type="button" class="jobtype-chip" data-type="安全员" data-cert="安全员证">安全员</button>
+                <button type="button" class="jobtype-chip" data-type="其他" data-cert="">其他</button>
+              </div>
+              <!-- 证书上传区域 -->
+              <div class="cert-upload-area" id="cert-upload-area"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">入场证有效期 <span class="required">*</span></label>
+              <div class="date-range-row">
+                <div class="date-range-item">
+                  <input type="date" id="permit-start-date" class="form-input">
+                  <span class="date-range-label">开始日期</span>
+                </div>
+                <span class="date-range-sep">至</span>
+                <div class="date-range-item">
+                  <input type="date" id="permit-end-date" class="form-input">
+                  <span class="date-range-label">结束日期</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 培训学习 -->
+          <div class="form-section">
+            <div class="section-title"><span>培训学习</span></div>
+            <p class="form-hint" style="margin-bottom:12px">请先完成以下安全培训课程学习，全部培训完成后方可参加考试</p>
+            <div class="training-list" id="training-list">
+              <!-- 由JS动态生成 -->
+            </div>
+          </div>
+
+          <!-- 宁德时代EHS公众号学习考试 -->
+          <div class="form-section" id="catl-ehs-section">
+            <div class="section-title"><span>宁德时代EHS公众号学习考试</span></div>
+            <p class="form-hint" style="margin-bottom:12px">请关注"宁德时代EHS"公众号，完成安全学习并通过考试后，上传学习考试通过凭证（截图/证书）</p>
+            <div class="form-group">
+              <label class="form-label">学习考试凭证 <span class="required">*</span></label>
+              <p class="form-hint">请上传宁德时代EHS公众号学习考试通过截图或证书</p>
+              <div class="exam-qrcode-upload" id="catl-ehs-upload-area">
+                <div class="exam-qrcode-box" id="catl-ehs-box" onclick="document.getElementById('file-catl-ehs').click()">
+                  <div class="exam-qrcode-placeholder" id="catl-ehs-placeholder">
+                    <svg viewBox="0 0 24 24" width="36" height="36"><path fill="#bbb" d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm11-2h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm-2 4h2v2h-2v-2zm4 0h2v2h-2v-2z"/></svg>
+                    <span>点击上传学习考试通过凭证</span>
+                  </div>
+                  <img id="catl-ehs-preview" class="exam-qrcode-img hidden" alt="宁德时代EHS学习凭证">
+                  <button type="button" class="exam-qrcode-remove hidden" id="catl-ehs-remove" onclick="event.stopPropagation();NewPermit.removeCatlEhs()">&times;</button>
+                </div>
+                <input type="file" id="file-catl-ehs" accept="image/*" class="hidden" onchange="NewPermit.handleCatlEhs(this.files[0])">
+              </div>
+            </div>
+          </div>
+
+          <!-- 安全考试 -->
+          <div class="form-section" id="exam-section">
+            <div class="section-title"><span>安全考试</span></div>
+            <div class="exam-locked" id="exam-locked-hint">
+              <svg viewBox="0 0 24 24" width="48" height="48"><path fill="#94a3b8" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              <p>请先完成上方所有培训课程，解锁考试</p>
+              <p class="exam-locked-sub">完成培训后，方可参加安全考试并生成入场许可证</p>
+            </div>
+            <div id="exam-content" class="hidden">
+              <p class="form-hint" style="margin-bottom:12px">考试合格（≥80分）并上传考试合格截图后，方可生成入场许可证</p>
+              <a href="https://ks.wjx.com/vm/wM53NC0.aspx" target="_blank" class="exam-link-btn" rel="noopener">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17l-5-5 1.41-1.41L9 14.17l7.59-7.59L18 8 9 17z"/></svg>
+                前往安全考试
+                <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+              </a>
+              <div class="form-group">
+                <label class="form-label">考试分数 <span class="required">*</span></label>
+                <input type="number" id="permit-exam-score" class="form-input" placeholder="请输入考试分数（≥80分为合格）" min="0" max="100">
+                <span class="exam-score-hint" id="exam-score-hint"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">考试合格截图 <span class="required">*</span></label>
+                <p class="form-hint">考试合格后，请上传考试合格截图</p>
+                <div class="exam-qrcode-upload" id="exam-qrcode-upload-area">
+                  <div class="exam-qrcode-box" id="exam-qrcode-box" onclick="document.getElementById('file-exam-qrcode').click()">
+                    <div class="exam-qrcode-placeholder" id="exam-qrcode-placeholder">
+                      <svg viewBox="0 0 24 24" width="36" height="36"><path fill="#bbb" d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm11-2h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm-2 4h2v2h-2v-2zm4 0h2v2h-2v-2z"/></svg>
+                      <span>点击上传考试合格截图</span>
+                    </div>
+                    <img id="exam-qrcode-preview" class="exam-qrcode-img hidden" alt="考试合格截图">
+                    <button type="button" class="exam-qrcode-remove hidden" id="exam-qrcode-remove" onclick="event.stopPropagation();NewPermit.removeExamQRCode()">&times;</button>
+                  </div>
+                  <input type="file" id="file-exam-qrcode" accept="image/*" class="hidden" onchange="NewPermit.handleExamQRCode(this.files[0])">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-block btn-submit" id="btn-submit-permit">生成入场许可证</button>
+        </div>
+        <div class="page-footer"><p>中换电（浙江）科技有限公司&copy;</p></div>
+      </div>
+
+      <!-- ==================== 证件预览 ==================== -->
+      <div id="page-permit-preview" class="page">
+        <div class="page-header">
+          <div class="header-left">
+            <button class="btn-back" id="back-from-preview">
+              <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            </button>
+            <span class="header-title">证件预览</span>
+          </div>
+        </div>
+
+        <div class="page-content preview-content">
+          <div class="permit-wrapper">
+            <div id="permit-card" class="permit-card">
+              <!-- 证件内容由JS动态生成 -->
+            </div>
+          </div>
+          <div class="permit-actions">
+            <button class="btn btn-primary btn-block" id="btn-download-permit">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              下载证件图片
+            </button>
+            <button class="btn btn-outline btn-block" id="btn-back-home" style="margin-top:10px">返回首页</button>
+          </div>
+        </div>
+        <div class="page-footer"><p>中换电（浙江）科技有限公司&copy;</p></div>
+      </div>
+
+      <!-- ==================== 证件明细 ==================== -->
+      <div id="page-details" class="page">
+        <div class="page-header">
+          <div class="header-left">
+            <span class="header-title">证件明细</span>
+            <span class="header-sub">发放管理</span>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <!-- 搜索栏 -->
+          <div class="search-bar">
+            <input type="text" id="detail-search" class="search-input" placeholder="搜索姓名 / 证件编号 / 身份证号 / 电话">
+            <button class="search-btn" id="btn-detail-search">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 10-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+          </div>
+
+          <!-- 筛选 -->
+          <div class="filter-bar">
+            <select id="filter-status" class="filter-select">
+              <option value="">全部状态</option>
+              <option value="待审核">待审核</option>
+              <option value="已驳回">已驳回</option>
+              <option value="有效">有效</option>
+              <option value="已过期">已过期</option>
+              <option value="已离场">已离场</option>
+            </select>
+            <select id="filter-unit" class="filter-select">
+              <option value="">全部单位</option>
+            </select>
+            <select id="filter-jobtype" class="filter-select">
+              <option value="">全部作业</option>
+              <option value="电工">电工</option>
+              <option value="焊工">焊工</option>
+              <option value="高处作业">高处作业</option>
+              <option value="司索工">司索工</option>
+              <option value="叉车司机">叉车司机</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+
+          <!-- 统计条 -->
+          <div class="detail-stats">
+            <span>共 <b id="detail-total">0</b> 条</span>
+            <span>待审 <b id="detail-pending-count">0</b></span>
+            <span>有效 <b id="detail-valid-count">0</b></span>
+            <span>过期 <b id="detail-expired-count">0</b></span>
+            <span>离场 <b id="detail-exited-count">0</b></span>
+          </div>
+
+          <!-- 列表 -->
+          <div class="detail-list" id="detail-list">
+            <!-- 由JS动态生成 -->
+          </div>
+
+          <!-- 导出按钮 -->
+          <button class="btn btn-outline btn-block" id="btn-export-details" style="margin-top:12px">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+            导出明细 (CSV)
+          </button>
+        </div>
+        <div class="page-footer"><p>中换电（浙江）科技有限公司&copy;</p></div>
+      </div>
+
+      <!-- ==================== 拍照核验 ==================== -->
+      <div id="page-verify" class="page">
+        <div class="page-header">
+          <div class="header-left">
+            <span class="header-title">拍照核验</span>
+            <span class="header-sub">人员身份识别</span>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <!-- 核验区域 -->
+          <div class="verify-section">
+            <div class="verify-capture-area" id="verify-capture-area">
+              <div class="verify-placeholder" id="verify-placeholder">
+                <svg viewBox="0 0 24 24" width="56" height="56"><path fill="#bbb" d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                <p>拍照或上传照片进行核验</p>
+              </div>
+              <img id="verify-photo" class="captured-photo hidden" alt="核验照片">
+              <video id="verify-video" class="hidden" autoplay playsinline></video>
+              <canvas id="verify-canvas" class="hidden"></canvas>
+            </div>
+            <div class="verify-buttons" id="verify-buttons">
+              <button class="btn btn-primary btn-photo" id="btn-verify-camera">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9z"/></svg>
+                拍照核验
+              </button>
+              <button class="btn btn-outline btn-photo" id="btn-verify-album">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2z"/></svg>
+                相册选图
+              </button>
+              <button class="btn btn-outline btn-photo hidden" id="btn-verify-start">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                开始识别
+              </button>
+              <button class="btn btn-outline btn-photo btn-danger hidden" id="btn-verify-cancel">
+                取消
+              </button>
+            </div>
+            <input type="file" id="file-verify-camera" accept="image/*" capture="user" class="hidden">
+            <input type="file" id="file-verify-album" accept="image/*" class="hidden">
+          </div>
+
+          <!-- 核验结果 -->
+          <div class="verify-result hidden" id="verify-result">
+            <!-- 由JS动态生成 -->
+          </div>
+
+          <!-- 核验历史 -->
+          <div class="verify-history-section">
+            <div class="section-title">
+              <span>核验历史</span>
+              <span class="history-count" id="history-count">0条</span>
+            </div>
+            <div class="verify-history-list" id="verify-history-list">
+              <!-- 由JS动态生成 -->
+            </div>
+          </div>
+        </div>
+        <div class="page-footer"><p>中换电（浙江）科技有限公司&copy;</p></div>
+      </div>
+
+      <!-- ==================== 证件审核 ==================== -->
+      <div id="page-review" class="page">
+        <div class="page-header">
+          <div class="header-left">
+            <span class="header-title">证件审核</span>
+            <span class="header-sub">待审核列表</span>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <!-- 统计条 -->
+          <div class="detail-stats">
+            <span>待审核 <b id="review-total">0</b> 条</span>
+          </div>
+
+          <!-- 列表 -->
+          <div class="review-list" id="review-list">
+            <!-- 由JS动态生成 -->
+          </div>
+        </div>
+        <div class="page-footer"><p>中换电（浙江）科技有限公司&copy;</p></div>
+      </div>
+
+      <!-- ==================== 设置 ==================== -->
+      <div id="page-settings" class="page">
+        <div class="page-header">
+          <div class="header-left">
+            <span class="header-title">设置</span>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <!-- 用户信息 -->
+          <div class="settings-user-card">
+            <div class="settings-avatar">
+              <svg viewBox="0 0 24 24" width="40" height="40"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="settings-user-info">
+              <div class="settings-username" id="settings-username">admin</div>
+              <div class="settings-role" id="settings-role">管理员</div>
+            </div>
+          </div>
+
+          <!-- 管理员功能 -->
+          <div id="admin-panel" class="settings-section">
+            <div class="section-title"><span>账号管理</span></div>
+            <div class="form-group">
+              <label class="form-label">手机号 <span class="required">*</span></label>
+              <input type="tel" id="new-user-phone" class="form-input" placeholder="请输入手机号" maxlength="11">
+            </div>
+            <div class="form-group">
+              <label class="form-label">初始密码 <span class="required">*</span></label>
+              <input type="text" id="new-user-pwd" class="form-input" placeholder="请设置初始密码">
+            </div>
+            <div class="form-group">
+              <label class="form-label">单位名称 <span class="required">*</span></label>
+              <input type="text" id="new-user-unit" class="form-input" placeholder="请输入单位名称">
+            </div>
+            <button class="btn btn-primary btn-block" id="btn-create-user">开通新账号</button>
+
+            <!-- 用户列表 -->
+            <div class="user-list-section">
+              <div class="section-title"><span>已开通账号</span></div>
+              <div class="user-list" id="user-list">
+                <!-- 由JS动态生成 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 普通用户功能 -->
+          <div id="user-panel" class="settings-section hidden">
+            <div class="section-title"><span>修改密码</span></div>
+            <div class="form-group">
+              <label class="form-label">原密码</label>
+              <input type="password" id="settings-old-pwd" class="form-input" placeholder="请输入原密码">
+            </div>
+            <div class="form-group">
+              <label class="form-label">新密码</label>
+              <input type="password" id="settings-new-pwd" class="form-input" placeholder="请输入新密码">
+            </div>
+            <div class="form-group">
+              <label class="form-label">确认新密码</label>
+              <input type="password" id="settings-confirm-pwd" class="form-input" placeholder="请再次输入新密码">
+            </div>
+            <button class="btn btn-primary btn-block" id="btn-settings-change-pwd">确认修改</button>
+          </div>
+
+          <!-- 关于我们 -->
+          <div class="qrcode-section about-section">
+            <div class="section-title"><span>关于我们</span></div>
+
+            <!-- 公司二维码卡片 -->
+            <div class="qrcode-card">
+              <div id="qrcode-container" class="qrcode-img"></div>
+              <div class="qrcode-info">
+                <div class="qrcode-title">中换电（浙江）科技有限公司</div>
+                <div class="qrcode-desc">扫码关注，获取更多服务支持</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-outline btn-block btn-logout" id="btn-logout">退出登录</button>
+        </div>
+        <div class="page-footer"><p>中换电（浙江）科技有限公司&copy;</p></div>
+      </div>
+
+      <!-- ==================== 底部导航 ==================== -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-page="dashboard">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          <span>首页</span>
+        </button>
+        <button class="nav-item" data-page="details">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+          <span>明细</span>
+        </button>
+        <button class="nav-item nav-review" data-page="review">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          <span>审核</span>
+          <span class="nav-badge hidden" id="review-badge">0</span>
+        </button>
+        <button class="nav-item nav-center" data-page="new-permit">
+          <div class="nav-center-btn">
+            <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </div>
+          <span>新增</span>
+        </button>
+        <button class="nav-item" data-page="verify">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          <span>核验</span>
+        </button>
+        <button class="nav-item" data-page="settings">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          <span>设置</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ==================== Toast 提示 ==================== -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- ==================== Loading 遮罩 ==================== -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <p class="loading-text" id="loading-text">加载中...</p>
+    </div>
+
+    <!-- ==================== 确认弹窗 ==================== -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-title" id="confirm-title">提示</div>
+        <div class="modal-body" id="confirm-body">确认操作？</div>
+        <div class="modal-actions">
+          <button class="btn btn-outline" id="confirm-cancel">取消</button>
+          <button class="btn btn-primary" id="confirm-ok">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 培训幻灯片查看器弹窗 ==================== -->
+    <div id="slideshow-overlay" class="slideshow-overlay hidden">
+      <div class="slideshow-container">
+        <div class="slideshow-header">
+          <button id="slideshow-close" class="slideshow-close-btn">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+          </button>
+          <div class="slideshow-title" id="slideshow-title">培训课件</div>
+          <div class="slideshow-counter" id="slideshow-counter">1 / 22</div>
+        </div>
+        <div class="slideshow-main" id="slideshow-main">
+          <img id="slideshow-img" src="" alt="培训幻灯片">
+        </div>
+        <div class="slideshow-footer">
+          <div class="slideshow-progress">
+            <div class="slideshow-progress-bar" id="slideshow-progress-bar"></div>
+          </div>
+          <div class="slideshow-controls">
+            <button class="slideshow-nav-btn" id="slideshow-prev">
+              <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/></svg>
+              上一页
+            </button>
+            <button class="slideshow-nav-btn" id="slideshow-next">
+              下一页
+              <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12l-4.58 4.59z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/face.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
