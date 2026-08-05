@@ -172,9 +172,11 @@ app.use(express.static(__dirname, {
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
     }
-    // Cache JS/CSS for 1 hour
+    // Don't cache JS/CSS either - avoid loading stale code after updates
     if (filepath.endsWith('.js') || filepath.endsWith('.css')) {
-      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
     }
   }
 }));
