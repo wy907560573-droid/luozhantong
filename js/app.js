@@ -315,10 +315,18 @@ const Auth = {
         await API.createUser(phone, phone, password, 'user', unit);
         return { success: true };
       } catch(e) {
+        console.error('API createUser failed:', e);
+        // If auth error, try to re-auth
+        if (e.status === 401) {
+          showToast('登录已过期，请重新登录', 'error');
+          Auth.logout();
+          return { success: false, msg: '登录已过期，请重新登录' };
+        }
         return { success: false, msg: e.message || '创建失败' };
       }
     }
 
+    // Local mode
     if (await Store.findUserByPhone(phone)) return { success: false, msg: '该手机号已注册' };
     const user = {
       id: Store.genId(),
@@ -1513,8 +1521,17 @@ const SettingsPage = {
   },
 
   async renderUserList() {
-    const users = (await Store.getUsers()).filter(u => u.role === 'user');
     const list = document.getElementById('user-list');
+    list.innerHTML = '<div class="empty-state"><p>加载中...</p></div>';
+
+    let users = [];
+    try {
+      users = (await Store.getUsers()).filter(u => u.role === 'user');
+    } catch(e) {
+      console.error('getUsers failed:', e);
+      list.innerHTML = '<div class="empty-state"><p>加载失败，请重试</p></div>';
+      return;
+    }
 
     if (users.length === 0) { list.innerHTML = '<div class="empty-state"><p>暂无已开通账号</p></div>'; return; }
 
@@ -1546,17 +1563,36 @@ const SettingsPage = {
     const phone = document.getElementById('new-user-phone').value.trim();
     const pwd = document.getElementById('new-user-pwd').value.trim();
     const unit = document.getElementById('new-user-unit').value.trim();
+    const btn = document.getElementById('btn-create-user');
 
+    if (!phone) { showToast('请输入手机号', 'error'); return; }
+    if (phone.length !== 11) { showToast('请输入正确的11位手机号', 'error'); return; }
+    if (!pwd) { showToast('请设置初始密码', 'error'); return; }
+    if (pwd.length < 4) { showToast('密码至少4位', 'error'); return; }
     if (!unit) { showToast('请输入单位名称', 'error'); return; }
-    const result = await Auth.createUser(phone, pwd, unit);
-    if (result.success) {
-      showToast('账号开通成功！', 'success');
-      document.getElementById('new-user-phone').value = '';
-      document.getElementById('new-user-pwd').value = '';
-      document.getElementById('new-user-unit').value = '';
-      await this.renderUserList();
-    } else {
-      showToast(result.msg, 'error');
+
+    // Loading state
+    const origText = btn.textContent;
+    btn.textContent = '开通中...';
+    btn.disabled = true;
+
+    try {
+      const result = await Auth.createUser(phone, pwd, unit);
+      if (result.success) {
+        showToast('账号开通成功！', 'success');
+        document.getElementById('new-user-phone').value = '';
+        document.getElementById('new-user-pwd').value = '';
+        document.getElementById('new-user-unit').value = '';
+        await this.renderUserList();
+      } else {
+        showToast(result.msg || '创建失败', 'error');
+      }
+    } catch(e) {
+      console.error('createUser error:', e);
+      showToast('创建失败：' + (e.message || '未知错误'), 'error');
+    } finally {
+      btn.textContent = origText;
+      btn.disabled = false;
     }
   },
 
