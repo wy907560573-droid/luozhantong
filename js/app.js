@@ -1560,16 +1560,29 @@ const SettingsPage = {
   },
 
   async createUser() {
-    const phone = document.getElementById('new-user-phone').value.trim();
-    const pwd = document.getElementById('new-user-pwd').value.trim();
-    const unit = document.getElementById('new-user-unit').value.trim();
+    console.log('[createUser] clicked');
+    const phoneEl = document.getElementById('new-user-phone');
+    const pwdEl = document.getElementById('new-user-pwd');
+    const unitEl = document.getElementById('new-user-unit');
     const btn = document.getElementById('btn-create-user');
+
+    if (!phoneEl || !pwdEl || !unitEl || !btn) {
+      console.error('[createUser] missing elements', { phoneEl: !!phoneEl, pwdEl: !!pwdEl, unitEl: !!unitEl, btn: !!btn });
+      showToast('页面元素缺失，请刷新后重试', 'error');
+      return;
+    }
+
+    const phone = phoneEl.value.trim();
+    const pwd = pwdEl.value.trim();
+    const unit = unitEl.value.trim();
 
     if (!phone) { showToast('请输入手机号', 'error'); return; }
     if (phone.length !== 11) { showToast('请输入正确的11位手机号', 'error'); return; }
     if (!pwd) { showToast('请设置初始密码', 'error'); return; }
     if (pwd.length < 4) { showToast('密码至少4位', 'error'); return; }
     if (!unit) { showToast('请输入单位名称', 'error'); return; }
+
+    console.log('[createUser] params ok, phone=', phone, 'unit=', unit);
 
     // Loading state
     const origText = btn.textContent;
@@ -1578,17 +1591,18 @@ const SettingsPage = {
 
     try {
       const result = await Auth.createUser(phone, pwd, unit);
+      console.log('[createUser] result=', result);
       if (result.success) {
         showToast('账号开通成功！', 'success');
-        document.getElementById('new-user-phone').value = '';
-        document.getElementById('new-user-pwd').value = '';
-        document.getElementById('new-user-unit').value = '';
+        phoneEl.value = '';
+        pwdEl.value = '';
+        unitEl.value = '';
         await this.renderUserList();
       } else {
         showToast(result.msg || '创建失败', 'error');
       }
     } catch(e) {
-      console.error('createUser error:', e);
+      console.error('[createUser] error:', e);
       showToast('创建失败：' + (e.message || '未知错误'), 'error');
     } finally {
       btn.textContent = origText;
@@ -1763,7 +1777,12 @@ function bindEvents() {
   });
 
   // ─── 设置页 ───
-  document.getElementById('btn-create-user').addEventListener('click', () => SettingsPage.createUser());
+  document.getElementById('btn-create-user').addEventListener('click', () => {
+    Promise.resolve(SettingsPage.createUser()).catch(e => {
+      console.error('[btn-create-user] handler error:', e);
+      showToast('操作异常：' + (e && e.message || '未知错误'), 'error');
+    });
+  });
   document.getElementById('btn-settings-change-pwd').addEventListener('click', () => SettingsPage.changePassword());
   document.getElementById('btn-logout').addEventListener('click', () => Auth.logout());
   document.getElementById('btn-logout-user').addEventListener('click', () => Auth.logout());
@@ -1806,14 +1825,19 @@ async function initApp() {
   }, 8000);
 
   try {
+    // Bind events FIRST - never depend on network/Store.init
+    try {
+      bindEvents();
+    } catch(e) {
+      console.error('bindEvents failed:', e);
+    }
+
     // Initialize store (detects API/Local mode)
     try {
       await Store.init();
     } catch(e) {
       console.warn('Store init failed:', e);
     }
-
-    bindEvents();
 
     // Check if already logged in
     const savedUser = Store.getCurrentUser();
